@@ -9,8 +9,11 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Z3DRP/bojoBot/internal/applier"
 	"github.com/Z3DRP/bojoBot/internal/dac"
 	"github.com/Z3DRP/bojoBot/internal/scheduledrun"
+	"github.com/Z3DRP/bojoBot/jprocessor"
+	"github.com/go-rod/rod"
 )
 
 func createContext(srun scheduledrun.ScheduledRun) (context.Context, context.CancelFunc) {
@@ -51,9 +54,27 @@ func main() {
 	ctx, cancel := createContext(*srun)
 	defer cancel()
 
+	jobTitle, err := dac.GetJobTitle(db, int(srun.JobTitleId))
+	if err != nil {
+		log.Fatal("Unable to find job title for scheduled run")
+	}
+
+	jobBoard, err := dac.GetJobBoard(db, int(srun.JobBoardId))
+	if err != nil {
+		log.Fatal("Unable to find job board for scheduled run")
+	}
+
 	useSubmissionLimit := srun.NumberOfSubmissions > 0
-	submissionLimit := srun.NumberOfSubmissions
-	submissionCount := 0
-	submissionCountMutex := &sync.Mutex{}
+	options := applier.NewRunOptions(*jobTitle, jobBoard.Url, "need to find css selctor", "css")
+	browser := rod.New().MustConnect()
+	defer browser.MustClose()
+	searchProcessor := jprocessor.NewJobProcessor(browser, srun.NumberOfSubmissions, useSubmissionLimit)
+	page := browser.MustPage(jobBoard.Url)
+	jobEntires, err := searchProcessor.ParseJobs(page)
+	if err != nil {
+		log.Fatal("Unable to parse job listings from page")
+	}
+
+	var wg sync.WaitGroup
 
 }

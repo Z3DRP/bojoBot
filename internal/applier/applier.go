@@ -12,10 +12,18 @@ type Applier interface {
 }
 
 type RunOptions struct {
-	JobInfo            job.JobTitle
-	Url                string
-	ApplyButton        string
-	FinishButton       string
-	UseSubmissionCount bool
+	JobInfo       job.JobTitle
+	Url           string
+	ApplySelector string
+	FinishButton  string
 	// other elements
+}
+
+func NewRunOptions(job job.JobTitle, url string, selctr string, finSelectr string) *RunOptions {
+	return &RunOptions{
+		JobInfo:       job,
+		Url:           url,
+		ApplySelector: selctr,
+		FinishButton:  finSelectr,
+	}
 }
