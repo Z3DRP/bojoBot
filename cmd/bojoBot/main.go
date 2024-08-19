@@ -3,13 +3,14 @@ package main
 import (
 	"context"
 	"database/sql"
-	"github.com/Z3DRP/bojoBot/internal/dac"
-	"github.com/Z3DRP/bojoBot/internal/scheduledrun"
 	"log"
 	"os"
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/Z3DRP/bojoBot/internal/dac"
+	"github.com/Z3DRP/bojoBot/internal/scheduledrun"
 )
 
 func createContext(srun scheduledrun.ScheduledRun) (context.Context, context.CancelFunc) {

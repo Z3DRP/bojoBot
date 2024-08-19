@@ -3,16 +3,19 @@ package applier
 import (
 	"context"
 	"sync"
+
+	"github.com/Z3DRP/bojoBot/internal/job"
 )
 
 type Applier interface {
-	Apply(ctx context.Context, job Job, submissionCountMutex *sync.Mutex, subCount *int, subLimit int)
+	Apply(ctx context.Context, ops RunOptions, submissionCountMutex *sync.Mutex, subCount *int, subLimit int)
 }
 
-type 
-
-type PageCommands struct {
-	ApplyButton  string
-	FinishButton string
+type RunOptions struct {
+	JobInfo            job.JobTitle
+	Url                string
+	ApplyButton        string
+	FinishButton       string
+	UseSubmissionCount bool
 	// other elements
 }
