@@ -1,20 +1,17 @@
-package cmplxapplier
+package applier
 
 import (
 	"context"
 	"fmt"
 	"sync"
 
-	"github.com/Z3DRP/bojoBot/internal/applier"
-	"github.com/Z3DRP/bojoBot/internal/bojo"
 	"github.com/go-rod/rod"
 )
 
 type ComplexApply struct {
-	search *bojo.BojoSearch
 }
 
-func (ca *ComplexApply) Apply(ctx context.Context, ops applier.RunOptions, subCountMtx *sync.Mutex, subCount *int, subLimit int) error {
+func (ca *ComplexApply) Apply(ctx context.Context, ops RunOptions, subCountMtx *sync.Mutex, subCount *int, subLimit int) error {
 	page := ca.Browser.MustPage(ops.Url)
 
 	subCountMtx.Lock()
