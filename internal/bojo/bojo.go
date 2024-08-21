@@ -1,7 +1,6 @@
 package bojo
 
 import (
-	"context"
 	"sync"
 
 	"github.com/Z3DRP/bojoBot/internal/job"
@@ -9,11 +8,10 @@ import (
 	"github.com/go-rod/rod"
 )
 
-type RunOptions struct {
+type SearchCriteria struct {
 	JobName       string
 	ExperienceLvl string
 	ExperienceYrs int
-	// other elements
 }
 
 type BojoSearch struct {
@@ -23,12 +21,13 @@ type BojoSearch struct {
 	SubmissionCount    int
 	SubmissionCountMtx *sync.Mutex
 	UseSubmissionCount bool
-	Jobs               []string
-	Options            *RunOptions
+	Jobs               map[string][]listing.LinkedinListing
+	URL                string
+	Criteria           *SearchCriteria
 }
 
 func NewBojoSearch(bwsr *rod.Browser, job *job.JobTitle, subLimit int, useSub bool) *BojoSearch {
-	opts := NewRunOptions(job.Name, job.ExperienceLevel, job.ExperienceYears)
+	opts := NewSearchCriteria(job.Name, job.ExperienceLevel, job.ExperienceYears)
 	return &BojoSearch{
 		Browser:            bwsr,
 		Pool:               rod.NewPagePool(20),
@@ -36,12 +35,12 @@ func NewBojoSearch(bwsr *rod.Browser, job *job.JobTitle, subLimit int, useSub bo
 		SubmissionCountMtx: &sync.Mutex{},
 		SubmissionCount:    0,
 		UseSubmissionCount: useSub,
-		Options:            opts,
+		Criteria:           opts,
 	}
 }
 
-func NewRunOptions(name string, exLvl string, exYr int) *RunOptions {
-	return &RunOptions{
+func NewSearchCriteria(name string, exLvl string, exYr int) *SearchCriteria {
+	return &SearchCriteria{
 		JobName:       name,
 		ExperienceLvl: exLvl,
 		ExperienceYrs: exYr,
