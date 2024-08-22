@@ -3,9 +3,9 @@ package esyapplier
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/Z3DRP/bojoBot/internal/bojo"
-	"github.com/Z3DRP/bojoBot/internal/element"
 	"github.com/Z3DRP/bojoBot/internal/listing"
 	"github.com/go-rod/rod"
 )
@@ -26,9 +26,25 @@ func (lnkdin *LinkdInEasyApply) Apply(ctx context.Context, bo *bojo.BojoSearch) 
 			continue
 		}
 		elm.Click("left", 1)
+		page.WaitStable(time.Millisecond * 200)
+		applyBtn, err := page.Element("jobs-apply-button--top-card")
+		if err != nil {
+			continue
+		}
+		// applyBtn.MustWaitStable().MustClick().MustWaitInvisible()
+		// applyBtn.WaitStable(time.Millisecond*200).Click("left", 1)
+		err = applyBtn.WaitStable(time.Millisecond * 200)
+		if err != nil {
+			continue
+		}
+		err = applyBtn.Click("left", 1)
+		if err != nil {
+			continue
+		}
 
 	}
 
+	// move locking unlocking into loop
 	bo.SubmissionCountMtx.Lock()
 	defer bo.SubmissionCountMtx.Unlock()
 
