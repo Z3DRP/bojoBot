@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/Z3DRP/bojoBot/internal/applier"
+	"github.com/Z3DRP/bojoBot/internal/bojo"
 	"github.com/Z3DRP/bojoBot/internal/dac"
 	"github.com/Z3DRP/bojoBot/internal/scheduledrun"
 	"github.com/Z3DRP/bojoBot/jprocessor"
@@ -54,7 +55,7 @@ func main() {
 	ctx, cancel := createContext(*srun)
 	defer cancel()
 
-	jobTitle, err := dac.GetJobTitle(db, int(srun.JobTitleId))
+	job, err := dac.GetJobTitle(db, int(srun.JobTitleId))
 	if err != nil {
 		log.Fatal("Unable to find job title for scheduled run")
 	}
@@ -65,16 +66,8 @@ func main() {
 	}
 
 	useSubmissionLimit := srun.NumberOfSubmissions > 0
-	options := applier.NewRunOptions(*jobTitle, jobBoard.Url, "need to find css selctor", "css")
 	browser := rod.New().MustConnect()
 	defer browser.MustClose()
-	searchProcessor := jprocessor.NewJobProcessor(browser, srun.NumberOfSubmissions, useSubmissionLimit)
-	page := browser.MustPage(jobBoard.Url)
-	jobEntires, err := searchProcessor.ParseJobs(page)
-	if err != nil {
-		log.Fatal("Unable to parse job listings from page")
-	}
-
-	var wg sync.WaitGroup
+	search := bojo.NewBojoSearch(ctx, cancel, browser, job, srun.NumberOfSubmissions, useSubmissionLimit)
 
 }

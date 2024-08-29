@@ -1,6 +1,6 @@
 package job
 
-type JobTitle struct {
+type Job struct {
 	Id              int
 	Name            string
 	ExperienceLevel string

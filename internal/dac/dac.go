@@ -81,10 +81,10 @@ func GetJobBoard(db *sql.DB, jid int) (*jobboard.JobBoard, error) {
 	return &board, nil
 }
 
-func GetJobTitle(db *sql.DB, jid int) (*job.JobTitle, error) {
+func GetJobTitle(db *sql.DB, jid int) (*job.Job, error) {
 	row := db.QueryRow("SELECT id, name, experienceLevel, experienceYears FROM JobTitles WHERE id=?", jid)
 
-	var title job.JobTitle
+	var title job.Job
 	err := row.Scan(&title.Id, &title.Name, &title.ExperienceLevel, &title.ExperienceYears)
 
 	if err != nil {
