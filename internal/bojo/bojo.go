@@ -26,8 +26,8 @@ type BoResult struct {
 }
 
 type SubmissionResults struct {
-	Err           error
 	ProcessedJobs map[string]BoResult
+	Err           error
 }
 
 type BojoSearch struct {
@@ -64,5 +64,12 @@ func NewSearchCriteria(name string, exLvl string, exYr int) SearchCriteria {
 		JobName:       name,
 		ExperienceLvl: exLvl,
 		ExperienceYrs: exYr,
+	}
+}
+
+func NewSubmissionResult(jobs map[string]BoResult, err error) *SubmissionResults {
+	return &SubmissionResults{
+		ProcessedJobs: jobs,
+		Err:           err,
 	}
 }

@@ -23,30 +23,33 @@ func handleErr(err error, errors *[]error, createCstmErr func() error) bool {
 	return false
 }
 
+// TODO ctx cancel will be handled by the service because it will have esy applys and cmpx applys or both
 func (l *LinkdInEasyApply) HandleApply() <-chan bojo.SubmissionResults {
 	// this func will take the context and the bo search
 	// it will loop all jobs and call apply on each job.. and keep track of errors for single jobs
 	// and it will keep track of the context timeout and job submisn count
 	outChan := make(chan bojo.SubmissionResults)
 	page := l.Search.Browser.MustPage(l.Search.URL)
-	jobsToProcess, err := l.ParseJobs(page, l.Search.Criteria)
-	selector := element.NewLinkedInSelector()
+	jobs, err := l.ParseJobs(page, l.Search.Criteria)
+	if err != nil {
+		outChan <- *bojo.NewSubmissionResult(nil, boerr.BrowserError{})
+	}
 
-	if len(jobsToProcess["easyApply"]) > 0 {
-		for _, job := range jobsToProcess["easyApply"] {
-			if l.Search.UseSubmissionCount && l.Search.SubmissionCount > l.Search.SubmissionLimit {
-				// return
-			}
-			// else check timeout and limit then call apply
-			// then write to the result chan
-
+	//TODO write jobs to channel then pass chanel to apply
+	for _, job := range jobs {
+		l.Search.SubmissionCountMtx.Lock()
+		if l.Search.UseSubmissionCount && l.Search.SubmissionCount > l.Search.SubmissionLimit {
+			l.Search.SubmissionCountMtx.Unlock()
+			break
 		}
+		l.Search.SubmissionCountMtx.Unlock()
+
 	}
 
 	return outChan
 }
 
-func (l *LinkdInEasyApply) Apply(ctx context.Context, bo *bojo.BojoSearch) (bool, []error) {
+func (l *LinkdInEasyApply) apply(ctx context.Context, bo *bojo.BojoSearch) (bool, []error) {
 	errors := make([]error, 0)
 	page := l.Search.Browser.MustPage(l.Search.URL)
 	// page, err := lnkdin.Search.Browser.Page(lnkdin.Search.URL)
@@ -122,8 +125,9 @@ func (l *LinkdInEasyApply) Apply(ctx context.Context, bo *bojo.BojoSearch) (bool
 	return nil
 }
 
-func (lnkdin *LinkdInEasyApply) ParseJobs(pg *rod.Page, criteria *bojo.SearchCriteria) <-chan listing.Listing {
-	// parses out complex and easy apply jobs
+func (lnkdin *LinkdInEasyApply) ParseJobs(pg *rod.Page) <-chan listing.Listing {
+	// parse out easy jobs
+	// then loop and write each to chan
 	jobListings := make(map[string][]listing.LinkedinListing)
 	return jobListings
 }

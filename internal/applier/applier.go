@@ -10,6 +10,6 @@ import (
 
 type Applier interface {
 	HandleJobSearch()
-	Apply(ctx context.Context, jp *bojo.BojoSearch)
+	apply(ctx context.Context, jp *bojo.BojoSearch)
 	ParseJobs(pg *rod.Page, c bojo.SearchCriteria) (map[string][]listing.Listing, error)
 }

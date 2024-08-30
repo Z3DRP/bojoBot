@@ -35,3 +35,11 @@ type NoListingFoundError struct {
 func (nlfe *NoListingFoundError) Error() string {
 	return fmt.Sprintf("No listings found jobId: %s on element %s", nlfe.JobId, nlfe.ElementType)
 }
+
+type BrowserError struct {
+	s string
+}
+
+func (be BrowserError) Error() string {
+	return fmt.Sprintf("A browser error ocurred: %s", be.s)
+}
