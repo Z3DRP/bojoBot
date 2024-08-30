@@ -23,6 +23,17 @@ func handleErr(err error, errors *[]error, createCstmErr func() error) bool {
 	return false
 }
 
+func loadListingChannel(lst []listing.Listing) <-chan listing.Listing {
+	out := make(chan listing.Listing)
+	go func() {
+		for l := range lst {
+			out <- l
+		}
+		close(out)
+	}()
+	return out
+}
+
 // TODO ctx cancel will be handled by the service because it will have esy applys and cmpx applys or both
 func (l *LinkdInEasyApply) HandleApply() <-chan bojo.SubmissionResults {
 	// this func will take the context and the bo search
