@@ -16,13 +16,8 @@ type SearchCriteria struct {
 }
 
 type BoResult struct {
-	JobId    string
-	Company  string
-	Location string
-	URL      string
-	Position string
-	Pay      float64
-	Err      error
+	JobListing listing.Listing
+	Err        error
 }
 
 type SubmissionResults struct {
@@ -32,7 +27,8 @@ type SubmissionResults struct {
 
 type BojoSearch struct {
 	Browser            *rod.Browser
-	Pool               rod.Pool[rod.Page]
+	EasyPool           rod.Pool[rod.Page]
+	ComplxPool         rod.Pool[rod.Page]
 	Ctx                context.Context
 	CtxCancel          context.CancelFunc
 	EasyOnly           bool
@@ -40,7 +36,7 @@ type BojoSearch struct {
 	SubmissionCount    int
 	SubmissionCountMtx *sync.Mutex
 	UseSubmissionCount bool
-	Jobs               map[string][]listing.LinkedinListing
+	Jobs               map[string][]listing.Listing
 	URL                string
 	Criteria           SearchCriteria
 }
@@ -48,7 +44,8 @@ type BojoSearch struct {
 func NewBojoSearch(ctx context.Context, cncl context.CancelFunc, bwsr *rod.Browser, job *job.Job, subLimit int, useSub bool) *BojoSearch {
 	return &BojoSearch{
 		Browser:            bwsr,
-		Pool:               rod.NewPagePool(20),
+		EasyPool:           rod.NewPagePool(10),
+		ComplxPool:         rod.NewPagePool(15),
 		Ctx:                ctx,
 		CtxCancel:          cncl,
 		SubmissionLimit:    subLimit,
@@ -71,5 +68,12 @@ func NewSubmissionResult(jobs map[string]BoResult, err error) *SubmissionResults
 	return &SubmissionResults{
 		ProcessedJobs: jobs,
 		Err:           err,
+	}
+}
+
+func NewBoResult(l listing.Listing, e error) BoResult {
+	return BoResult{
+		JobListing: l,
+		Err:        e,
 	}
 }

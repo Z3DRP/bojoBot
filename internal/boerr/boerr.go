@@ -11,20 +11,20 @@ func (ge *GeneralError) Error() string {
 }
 
 type NoResults struct {
-	s string
+	S string
 }
 
 func (nr NoResults) Error() string {
-	return nr.s
+	return nr.S
 }
 
 type SubmissionError struct {
-	s     string
+	S     string
 	JobId string
 }
 
 func (se SubmissionError) Error() string {
-	return se.s
+	return se.S
 }
 
 type NoListingFoundError struct {
@@ -37,9 +37,17 @@ func (nlfe *NoListingFoundError) Error() string {
 }
 
 type BrowserError struct {
-	s string
+	S string
 }
 
 func (be BrowserError) Error() string {
-	return fmt.Sprintf("A browser error ocurred: %s", be.s)
+	return fmt.Sprintf("A browser error ocurred: %s", be.S)
+}
+
+type PageActionError struct {
+	S string
+}
+
+func (p PageActionError) Error() string {
+	return fmt.Sprintf("An expected error occurred while performing: %s", p.S)
 }
